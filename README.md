@@ -7,10 +7,10 @@ At its core, OpenSESME is a realtively simple program for moving files from one 
 
 At present, OpenSESME looks for config files that contain the following variables:
 
--`ACTION_NAME` - A unique name for the config/action being performed
--`INPUT_DIR` - Where OpenSESME will watch for files to appear
--`ARCHIVE_DIR` - Where OpenSESME will place unaltered copies of incoming files
--`OUTPUT_DIR` - Destination for moved files
+- `ACTION_NAME` - A unique name for the config/action being performed
+- `INPUT_DIR` - Where OpenSESME will watch for files to appear
+- `ARCHIVE_DIR` - Where OpenSESME will place unaltered copies of incoming files
+- `OUTPUT_DIR` - Destination for moved files
 
 Planned improvements: 
 - Support for `PERFORM` - to specify modifications to be performed to a file (i.e. `sed`, `tr`, etc)
