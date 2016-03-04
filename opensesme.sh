@@ -1,5 +1,6 @@
 #!/bin/bash
 # Spooler Script v0.0.8 - "Quicksave"
+# https://github.com/seattletimes/opensesme
 # E. A. Griffon - 2016-03-03
 # Thanks to StackExchange, Yaro Kasear, Orville Broadbeak, and Skyler Bunny
 # http://unix.stackexchange.com/questions/24952/script-to-monitor-folder-for-new-files
@@ -9,7 +10,11 @@ CONFIG_DIR=/usr/local/opensesme/config
 #CONFIG_DIR=/etc/opensesme.d/
 LOGFILE=/var/log/opensesme.log
 
-# Bring in config files
+# Check for flags here
+# if $flagthingy tells us to read a single config, then
+# source $specified_conf_file
+# else 
+# Bring in config files from directory
 for CONF in $(ls $CONFIG_DIR/*.cfg | xargs)
 do
 echo -e Reading $CONF\n

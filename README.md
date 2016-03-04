@@ -1,5 +1,5 @@
 # OpenSESME
-### v0.0.8
+### v0.0.8  - 2016-03-03
 
 OpenSESME is a replacement for the original Simple Extensible Spooler Module (SESME) by Guy Bushnell and Alan Moore.
 
