@@ -1,7 +1,7 @@
 #!/bin/bash
-# Spooler Script v0.0.8 - "Quicksave"
+# Spooler Script v0.0.9 - "Save The PIDs!"
 # https://github.com/seattletimes/opensesme
-# E. A. Griffon - 2016-03-03
+# E. A. Griffon - 2016-03-08
 # Thanks to StackExchange, Yaro Kasear, Orville Broadbeak, and Skyler Bunny
 # http://unix.stackexchange.com/questions/24952/script-to-monitor-folder-for-new-files
 
@@ -9,6 +9,8 @@
 CONFIG_DIR=/usr/local/opensesme/config
 #CONFIG_DIR=/etc/opensesme.d/
 LOGFILE=/var/log/opensesme.log
+
+echo > /tmp/opensesme.pid
 
 # Check for flags here
 # if $flagthingy tells us to read a single config, then
@@ -42,7 +44,8 @@ inotifywait -m $INPUT_DIR -e close_write |
 		cp $path/$file $ARCHIVE_DIR/$file|| (echo >> $LOGFILE "`date -Is` $ACTION_NAME: archival copy has failed for $path/$file to $ARCHIVE_DIR/$file"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: archival copy has failed for $path/$file to $ARCHIVE_DIR/$file)
 		
 		# Let's DO STUFF!
-		if $MODIFY='true' then	
+		if [ $MODIFY='true' ]
+		then	
 			#$PERFORM ||(echo >> $LOGFILE "`date -Is` $ACTION_NAME: Execution of $PERFORM has failed for $path/$file"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: Execution of $PERFORM has failed for $path/$file)
 			echo >> $LOGFILE "`date -Is` $ACTION_NAME: We did $PERFORM!"
 		fi
@@ -66,5 +69,6 @@ inotifywait -m $INPUT_DIR -e close_write |
  
     # Run the loop in the background with '&'
     done &
+	echo $ACTION_NAME - $! >>/tmp/opensesme.pid
 done
 exit 0
