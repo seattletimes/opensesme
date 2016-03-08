@@ -44,7 +44,7 @@ inotifywait -m $INPUT_DIR -e close_write |
 		cp $path/$file $ARCHIVE_DIR/$file|| (echo >> $LOGFILE "`date -Is` $ACTION_NAME: archival copy has failed for $path/$file to $ARCHIVE_DIR/$file"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: archival copy has failed for $path/$file to $ARCHIVE_DIR/$file)
 		
 		# Let's DO STUFF!
-		if [ $MODIFY='true' ]
+		if [ $MODIFY="true" ]
 		then	
 			#$PERFORM ||(echo >> $LOGFILE "`date -Is` $ACTION_NAME: Execution of $PERFORM has failed for $path/$file"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: Execution of $PERFORM has failed for $path/$file)
 			echo >> $LOGFILE "`date -Is` $ACTION_NAME: We did $PERFORM!"
@@ -69,6 +69,6 @@ inotifywait -m $INPUT_DIR -e close_write |
  
     # Run the loop in the background with '&'
     done &
-	echo $ACTION_NAME - $! >>/tmp/opensesme.pid
+echo $ACTION_NAME - $! >>/tmp/opensesme.pid
 done
 exit 0
