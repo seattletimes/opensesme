@@ -25,4 +25,4 @@ Planned improvements:
 - Support for starting opensesme with flags to specify single configs, etc
 - Support for process tracking - linking PIDs with Action Names, for starting, status, and stopping via a control script, preventing multiple instances of the same action, etc
 
-*Thanks to Orville Broadbeak, Skyler Bunny, and Yaro Kasear for help with this project.*
+*Thanks to Orville Broadbeak, Skyler Bunny, and Yaro Kasear for their help with and contributions to this project.*
