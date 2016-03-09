@@ -1,7 +1,7 @@
 #!/bin/bash
-# Spooler Script v0.0.9 - "Save The PIDs!"
+# Spooler Script v0.0.10
 # https://github.com/seattletimes/opensesme
-# E. A. Griffon - 2016-03-08
+# E. A. Griffon - 2016-03-09
 # Thanks to StackExchange, Yaro Kasear, Orville Broadbeak, and Skyler Bunny
 # http://unix.stackexchange.com/questions/24952/script-to-monitor-folder-for-new-files
 
@@ -30,6 +30,8 @@ echo >> $LOGFILE "`date -Is` $ACTION_NAME: Input directory is $INPUT_DIR"
 #echo >> $LOGFILE "`date -Is` $ACTION_NAME: Target is $TARGET"
 echo >> $LOGFILE "`date -Is` $ACTION_NAME: Archive directory is $ARCHIVE_DIR"
 echo >> $LOGFILE "`date -Is` $ACTION_NAME: Output directory is $OUTPUT_DIR"
+echo >> $LOGFILE "`date -Is` $ACTION_NAME: Archiving set to $ARCHIVE"
+echo >> $LOGFILE "`date -Is` $ACTION_NAME: Modifications set to $MODIFY"
 
 # inotify does the heavy lifting here - it'll monitor and let us know when a file is done being written to (i.e. a FTP transfer stops, move is done, etc)
 inotifywait -m $INPUT_DIR -e close_write |
@@ -41,10 +43,24 @@ inotifywait -m $INPUT_DIR -e close_write |
         echo >> $LOGFILE "`date -Is` $ACTION_NAME: The file $file appeared in directory $path via $action"
 
 		# Archive an unmodified version
-		cp $path/$file $ARCHIVE_DIR/$file|| (echo >> $LOGFILE "`date -Is` $ACTION_NAME: archival copy has failed for $path/$file to $ARCHIVE_DIR/$file"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: archival copy has failed for $path/$file to $ARCHIVE_DIR/$file)
+		if [ $ARCHIVE == true ]
+		then
+			cp $path/$file $ARCHIVE_DIR/$file|| (echo >> $LOGFILE "`date -Is` $ACTION_NAME: archival copy has failed for $path/$file to $ARCHIVE_DIR/$file"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: archival copy has failed for $path/$file to $ARCHIVE_DIR/$file)
+		
+			# Test to see if archive file is not actually there, and if it isn't, log errors
+            if
+				[ ! -e "$ARCHIVE_DIR/$file" ]
+            then
+				echo >> $LOGFILE "`date -Is` $ACTION_NAME: File check has failed for presence of archived file in $ARCHIVE_DIR/$file"
+                        logger -p local2.notice -t OpenSESME -- $ACTION_NAME: File check has failed for presence of archived file in $ARCHIVE_DIR/$file
+            else 
+				# "Log" the events
+				echo >> $LOGFILE "`date -Is` $ACTION_NAME: Archived $file from $path to $ARCHIVE_DIR/$file"
+			fi
+		fi
 		
 		# Let's DO STUFF!
-		if [ $MODIFY="true" ]
+		if [ $MODIFY == true ]
 		then	
 			#$PERFORM ||(echo >> $LOGFILE "`date -Is` $ACTION_NAME: Execution of $PERFORM has failed for $path/$file"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: Execution of $PERFORM has failed for $path/$file)
 			echo >> $LOGFILE "`date -Is` $ACTION_NAME: We did $PERFORM!"
@@ -69,6 +85,6 @@ inotifywait -m $INPUT_DIR -e close_write |
  
     # Run the loop in the background with '&'
     done &
-echo $ACTION_NAME - $! >>/tmp/opensesme.pid
+echo $! - $ACTION_NAME >>/tmp/opensesme.pid
 done
 exit 0
