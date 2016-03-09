@@ -5,7 +5,7 @@ OpenSESME is a replacement for the original Simple Extensible Spooler Module (SE
 
 At its core, OpenSESME is a realtively simple program for moving files from one place to another. There's error-checking, logging of actions and errors, support for configuration files, and (soon) support for modifying files.
 
-At present, OpenSESME looks for config files that contain the following variables:
+At present, OpenSESME looks for (`*.conf`) config files in `/etc/opensesme.d/` that contain the following variables:
 
 - `ACTION_NAME` - A unique name for the config/action being performed
 - `INPUT_DIR` - Where OpenSESME will watch for files to appear
@@ -15,6 +15,7 @@ At present, OpenSESME looks for config files that contain the following variable
 - `OUTPUT_DIR` - Destination for moved files
 
 Planned improvements: 
+- Support for `ENABLED` - Boolean to indicate whether or not the config is to be used or not
 - Support for `PERFORM` - to specify modifications to be performed to a file (i.e. `sed`, `tr`, etc) if `MODIFY` is `true`
 - Support for `TARGET` - to specify filenames to look for
 - Support for starting opensesme with flags to specify single configs, etc
