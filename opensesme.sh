@@ -17,16 +17,17 @@ echo > /tmp/opensesme.pid
 # else 
 # Bring in config files from directory
 for CONF in $(ls $CONFIG_DIR/*.conf | xargs)
-	do
-	echo -e Reading $CONF\n
-	echo >> $LOGFILE "`date -Is` OpenSESME Main: Reading $CONF"
-	source $CONF
-	
-	# Exit if the config is disabled 
-	#if [ $ENABLED == false ]
-	#then
-	#gtfo
-	#fi
+    do
+		echo -e "Reading $CONF \n"
+        echo >> $LOGFILE "`date -Is` OpenSESME Main: Reading $CONF"
+        source $CONF
+
+        # Exit if the config is disabled
+        if [ $ENABLED == false ]
+        then
+            echo >> $LOGFILE "`date -Is` OpenSESME Main: $CONF is disabled."
+            break
+        fi
 	
 	# Log things about the action
 	logger -p local2.notice -t OpenSESME -- Starting action $ACTION_NAME
