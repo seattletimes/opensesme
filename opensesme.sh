@@ -1,21 +1,27 @@
 #!/bin/bash
 # Spooler Script v0.0.10
 # https://github.com/seattletimes/opensesme
-# E. A. Griffon - 2016-03-09
+# E. A. Griffon - 2016-03-10
 # Thanks to StackExchange, Yaro Kasear, Orville Broadbeak, and Skyler Bunny
 # http://unix.stackexchange.com/questions/24952/script-to-monitor-folder-for-new-files
 
 # Define where configurations are held
 CONFIG_DIR=/etc/opensesme.d/
+# Define where to log to
 LOGFILE=/var/log/opensesme.log
 
 echo > /tmp/opensesme.pid
 
 # Check for flags here
-# if $flagthingy tells us to read a single config, then
-# source $specified_conf_file
-# else 
-# Bring in config files from directory
+#while getopts ":f:" opt;do
+#case
+#f)
+#
+#;;
+#\?)
+#echo "Invalid option: -$OPTARG" >&2
+#;;
+#esac
 for CONF in $(ls $CONFIG_DIR/*.conf | xargs)
     do
 		echo -e "Reading $CONF \n"
@@ -45,7 +51,7 @@ for CONF in $(ls $CONFIG_DIR/*.conf | xargs)
 		# Start a loop that pulls variables from inotifywait
 		while read path action file; do
 
-			# "Log" that the file has appeared
+			# Log that the file has appeared
 			echo >> $LOGFILE "`date -Is` $ACTION_NAME: The file $file appeared in directory $path via $action"
 
 			# Archive an unmodified version
@@ -93,4 +99,5 @@ for CONF in $(ls $CONFIG_DIR/*.conf | xargs)
 		done &
 	echo $! - $ACTION_NAME >>/tmp/opensesme.pid
 done
+#done
 exit 0
