@@ -7,21 +7,23 @@
 
 # Define where configurations are held
 CONFIG_DIR=/etc/opensesme.d/
+
 # Define where to log to
 LOGFILE=/var/log/opensesme.log
 
 echo > /tmp/opensesme.pid
 
-# Check for flags here
-#while getopts ":f:" opt;do
-#case
-#f)
-#
-#;;
-#\?)
-#echo "Invalid option: -$OPTARG" >&2
-#;;
-#esac
+# Check for flags here (testing!)
+while getopts ":f" opt; do
+    case $opt in
+            f)
+                echo "you chose f!";exit 0
+			;;
+			\?)
+				echo "Invalid option: -$OPTARG" >&2;exit 1
+			;;
+	esac
+done
 for CONF in $(ls $CONFIG_DIR/*.conf | xargs)
     do
 		echo -e "Reading $CONF \n"
@@ -99,5 +101,4 @@ for CONF in $(ls $CONFIG_DIR/*.conf | xargs)
 		done &
 	echo $! - $ACTION_NAME >>/tmp/opensesme.pid
 done
-#done
 exit 0
