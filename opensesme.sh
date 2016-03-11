@@ -1,7 +1,7 @@
 #!/bin/bash
 # Spooler Script v0.0.10
 # https://github.com/seattletimes/opensesme
-# E. A. Griffon - 2016-03-10
+# E. A. Griffon - 2016-03-11
 # Thanks to StackExchange, Yaro Kasear, Orville Broadbeak, and Skyler Bunny
 # http://unix.stackexchange.com/questions/24952/script-to-monitor-folder-for-new-files
 
@@ -14,16 +14,21 @@ LOGFILE=/var/log/opensesme.log
 echo > /tmp/opensesme.pid
 
 # Check for flags here (testing!)
-while getopts ":f" opt; do
-    case $opt in
-            f)
-                echo "you chose f!";exit 0
-			;;
-			\?)
-				echo "Invalid option: -$OPTARG" >&2;exit 1
-			;;
-	esac
+while getopts ":f:" opt; do
+        case $opt in
+                f)
+                        echo "you chose the file $OPTARG!";exit 0
+                        # Do a thing with a single file specified
+                ;;
+                \?)
+                        echo "Invalid option: -$OPTARG" >&2;exit 1
+                ;;
+                :)
+                        echo "Option -$OPTARG requires an argument."
+                ;;
+        esac
 done
+
 for CONF in $(ls $CONFIG_DIR/*.conf | xargs)
     do
 		echo -e "Reading $CONF \n"
