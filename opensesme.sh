@@ -1,7 +1,7 @@
 #!/bin/bash
-# Spooler Script v0.0.10
+# Spooler Script v0.0.11
 # https://github.com/seattletimes/opensesme
-# E. A. Griffon - 2016-03-11
+# E. A. Griffon - 2016-03-23
 # Thanks to StackExchange, Yaro Kasear, Orville Broadbeak, and Skyler Bunny
 # http://unix.stackexchange.com/questions/24952/script-to-monitor-folder-for-new-files
 
@@ -13,12 +13,20 @@ LOGFILE=/var/log/opensesme.log
 
 echo > /tmp/opensesme.pid
 
+# Make a function to check config files
+configcheck () {
+:
+#check $1
+# check for  #ACTO
+}
+
 # Check for flags here (testing!)
 while getopts ":f:" opt; do
         case $opt in
                 f)
                         echo "you chose the file $OPTARG!";exit 0
                         # Do a thing with a single file specified
+						# configcheck $OPTARG
                 ;;
                 \?)
                         echo "Invalid option: -$OPTARG" >&2;exit 1
@@ -33,7 +41,11 @@ for CONF in $(ls $CONFIG_DIR/*.conf | xargs)
     do
 		echo -e "Reading $CONF \n"
         echo >> $LOGFILE "`date -Is` OpenSESME Main: Reading $CONF"
-        source $CONF
+
+        # Use function to check config file
+		# configcheck $CONF
+
+		source $CONF
 
         # Exit if the config is disabled
         if [ $ENABLED == false ]
