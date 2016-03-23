@@ -16,8 +16,13 @@ echo > /tmp/opensesme.pid
 # Make a function to check config files
 configcheck () {
 :
-#check $1
-# check for  #ACTO
+# check $1 for $ENABLED - if false, skip check? or notify?
+# check $1 for $ACTION_NAME
+# check $1 for $INPUT_DIR
+# check $1 for $ARCHIVE
+# check $1 for $ARCHIVE_DIR if $ARCHIVE == true
+# check $1 for $MODIFY
+# check $1 for $OUTPUT_DIR
 }
 
 # Check for flags here (testing!)
