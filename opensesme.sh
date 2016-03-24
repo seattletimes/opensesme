@@ -34,7 +34,6 @@ configcheck ()
 	elif [ $ARCHIVE == true ] && ! grep --quiet ARCHIVE_DIR\= $1; then
 		echo "config $1 has ARCHIVE set true but is missing ARCHIVE_DIR - config invalid!"
 	fi
-	fi
 
 	# Check for Modify and Perform statements
 	if ! grep --quiet MODIFY\= $1; then
