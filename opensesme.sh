@@ -1,7 +1,7 @@
 #!/bin/bash
-# Spooler Script v0.0.11
+# OpenSESME v0.0.12
 # https://github.com/seattletimes/opensesme
-# E. A. Griffon - 2016-03-23
+# E. A. Griffon - 2016-03-24
 # Thanks to StackExchange, Yaro Kasear, Orville Broadbeak, and Skyler Bunny
 # http://unix.stackexchange.com/questions/24952/script-to-monitor-folder-for-new-files
 
@@ -11,18 +11,42 @@ CONFIG_DIR=/etc/opensesme.d/
 # Define where to log to
 LOGFILE=/var/log/opensesme.log
 
+# Empty the pid file (still in testing)
 echo > /tmp/opensesme.pid
 
-# Make a function to check config files
-configcheck () {
-:
-# check $1 for $ENABLED - if false, skip check? or notify?
-# check $1 for $ACTION_NAME
-# check $1 for $INPUT_DIR
-# check $1 for $ARCHIVE
-# check $1 for $ARCHIVE_DIR if $ARCHIVE == true
-# check $1 for $MODIFY
-# check $1 for $OUTPUT_DIR
+# Make a function to be called to check config files
+# This needs to be fleshed out more to check for malformed paths, invalid characters, etc
+configcheck () 
+{
+	# Check config for ENABLED statement
+	if ! grep --quiet ENABLED\= $1; then
+		echo "config $1 is missing ENABLED statement - config invalid!"
+	fi
+
+	# Check config for Input Directory statement
+	if ! grep --quiet INPUT_DIR\= $1; then
+		echo "config $1 is missing INPUT_DIR statement - config invalid!"
+	fi
+
+	# Check config for Archive and Archive Directory statements
+	if ! grep --quiet ARCHIVE\= $1; then
+		echo "config $1 is missing ARCHIVE statement - config invalid!"
+	elif [ $ARCHIVE == true ] && ! grep --quiet ARCHIVE_DIR\= $1; then
+		echo "config $1 has ARCHIVE set true but is missing ARCHIVE_DIR - config invalid!"
+	fi
+	fi
+
+	# Check for Modify and Perform statements
+	if ! grep --quiet MODIFY\= $1; then
+		echo "config $1 is missing MODIFY statement"
+	elif [ $MODIFY == true ] && ! grep --quiet PERFORM\= $1; then
+		echo "config $1 has MODIFY set true, but is missing PERFORM statement - config invalid!"
+	fi
+
+	# Check for Output Directory statement
+	if ! grep --quiet OUTPUT_DIR\= $1; then
+		echo "config $1 is missing OUTPUT_DIR statement - config invalid!"
+	fi
 }
 
 # Check for flags here (testing!)
@@ -121,6 +145,7 @@ for CONF in $(ls $CONFIG_DIR/*.conf | xargs)
 	 
 		# Run the loop in the background with '&'
 		done &
+	# Record the pid of the last run program (not... quite working in a useful way)
 	echo $! - $ACTION_NAME >>/tmp/opensesme.pid
 done
 exit 0
