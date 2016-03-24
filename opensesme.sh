@@ -21,6 +21,8 @@ configcheck ()
 	# Check config for ENABLED statement
 	if ! grep --quiet ENABLED\= $1; then
 		echo "config $1 is missing ENABLED statement - config invalid!"
+	elif [ ! $ENABLED == true ] && [ ! $ENABLED == false ]; then
+		echo "config $1 has ENABLED set to something other than 'true' or 'false'"
 	fi
 
 	# Check config for Input Directory statement
@@ -31,6 +33,8 @@ configcheck ()
 	# Check config for Archive and Archive Directory statements
 	if ! grep --quiet ARCHIVE\= $1; then
 		echo "config $1 is missing ARCHIVE statement - config invalid!"
+	elif [ ! $ARCHIVE == true ] && [ ! $ARCHIVE == false ]; then
+		echo "config $1 has ARCHIVE set to something other than 'true' or 'false'"
 	elif [ $ARCHIVE == true ] && ! grep --quiet ARCHIVE_DIR\= $1; then
 		echo "config $1 has ARCHIVE set true but is missing ARCHIVE_DIR - config invalid!"
 	fi
@@ -38,6 +42,8 @@ configcheck ()
 	# Check for Modify and Perform statements
 	if ! grep --quiet MODIFY\= $1; then
 		echo "config $1 is missing MODIFY statement"
+	elif [ ! $MODIFY == true ] && [ ! $MODIFY == false ]; then
+		echo "config $1 has MODIFY set to something other than 'true' or 'false'"
 	elif [ $MODIFY == true ] && ! grep --quiet PERFORM\= $1; then
 		echo "config $1 has MODIFY set true, but is missing PERFORM statement - config invalid!"
 	fi
