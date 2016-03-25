@@ -1,7 +1,7 @@
 #!/bin/bash
 # OpenSESME v0.0.12
 # https://github.com/seattletimes/opensesme
-# E. A. Griffon - 2016-03-24
+# E. A. Griffon - 2016-03-25
 # Thanks to StackExchange, Yaro Kasear, Orville Broadbeak, and Skyler Bunny
 # http://unix.stackexchange.com/questions/24952/script-to-monitor-folder-for-new-files
 
