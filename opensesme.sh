@@ -124,7 +124,7 @@ for CONF in $(ls $CONFIG_DIR/*.conf | xargs)
 					[ ! -e "$ARCHIVE_DIR/$file" ]
 				then
 					echo >> $LOGFILE "`date -Is` $ACTION_NAME: File check has failed for presence of archived file in $ARCHIVE_DIR/$file"
-							logger -p local2.notice -t OpenSESME -- $ACTION_NAME: File check has failed for presence of archived file in $ARCHIVE_DIR/$file
+					logger -p local2.notice -t OpenSESME -- $ACTION_NAME: File check has failed for presence of archived file in $ARCHIVE_DIR/$file
 				else 
 					# "Log" the events
 					echo >> $LOGFILE "`date -Is` $ACTION_NAME: Archived $file from $path to $ARCHIVE_DIR/$file"
@@ -146,10 +146,10 @@ for CONF in $(ls $CONFIG_DIR/*.conf | xargs)
 
 					# Test to see if file is not actually there, and if it isn't, log errors
 					if
-							[ ! -e "$OUTPUT_DIR/$FILENAME" ]
+						[ ! -e "$OUTPUT_DIR/$FILENAME" ]
 					then
-							echo >> $LOGFILE "`date -Is` $ACTION_NAME: File check has failed for presence of $OUTPUT_DIR/$FILENAME"
-							logger -p local2.notice -t OpenSESME -- $ACTION_NAME: File check has failed for presence of $OUTPUT_DIR/$FILENAME
+						echo >> $LOGFILE "`date -Is` $ACTION_NAME: File check has failed for presence of $OUTPUT_DIR/$FILENAME"
+						logger -p local2.notice -t OpenSESME -- $ACTION_NAME: File check has failed for presence of $OUTPUT_DIR/$FILENAME
 					else 
 						# "Log" the events
 						echo >> $LOGFILE "`date -Is` $ACTION_NAME: Moved $file from $path to $OUTPUT_DIR as $FILENAME"
