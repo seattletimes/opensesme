@@ -1,12 +1,16 @@
 # OpenSESME
 ### v0.1.0 - 2016-03-25
-**NAME**
+
+#####NAME
+
 	opensesme.sh - a spooler module to watch for files to appear, then trigger actions on them
 
-**SYNOPSIS**
+#####SYNOPSIS
+
 	openseseme.sh [OPTION]...
 	
-**DESCRIPTION**
+#####DESCRIPTION
+
 	OpenSESME is a replacement for the original Simple Extensible Spooler Module (SESME) by Guy Bushnell and Alan Moore.
 
 	At its core, OpenSESME is a realtively simple program for moving files from one place to another, utilizing inotifywait with simple bash scripting. 
@@ -27,7 +31,8 @@
 
 	There is a function `configcheck` that is used to do a (currently very basic) check on requested config files.
 
-**OPTIONS**
+
+#####OPTIONS
 	`-c [filename]` 
 		use the `configcheck` function to check the given configuration file, then exit 
 	
@@ -35,9 +40,10 @@
 		run opensesme with the given configuration file, then exit
 
 
-Planned improvements: 
-- Support for `PERFORM` - to specify modifications to be performed to a file (i.e. `sed`, `tr`, etc) if `MODIFY` is `true`
-- Support for `TARGET` - to specify filenames to look for
-- Support for process tracking - linking PIDs with Action Names, for starting, status, and stopping via a control script, preventing multiple instances of the same action, etc
+#####PLANNED IMPROVEMENTS
+ 
+	- Support for `PERFORM` - to specify modifications to be performed to a file (i.e. `sed`, `tr`, etc) if `MODIFY` is `true`
+	- Support for `TARGET` - to specify filenames to look for
+	- Support for process tracking - linking PIDs with Action Names, for starting, status, and stopping via a control script, preventing multiple instances of the same action, etc
 
 *Thanks to Orville Broadbeak, Skyler Bunny, and Yaro Kasear for their help with and contributions to this project.*
