@@ -1,5 +1,5 @@
 # OpenSESME
-### v0.0.12 - 2016-03-24
+### v0.0.12 - 2016-03-25
 
 OpenSESME is a replacement for the original Simple Extensible Spooler Module (SESME) by Guy Bushnell and Alan Moore.
 
@@ -20,6 +20,8 @@ At present, OpenSESME looks for (`*.conf`) config files in `/etc/opensesme.d/` (
 There is also a `$LOGFILE` variable that is set to `/var/log/opensesme.log` by default.
 
 There is a function `configcheck` that is used to do a (currently very basic) check on requested config files.
+
+`opensesme -c [filename]` will use the `configcheck` function to check the given configuration file 
 
 Planned improvements: 
 - Support for `PERFORM` - to specify modifications to be performed to a file (i.e. `sed`, `tr`, etc) if `MODIFY` is `true`
