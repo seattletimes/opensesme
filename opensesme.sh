@@ -21,7 +21,7 @@ configcheck ()
 	# Check config for ENABLED statement
 	if ! grep --quiet ENABLED\= $1; then
 		echo "config $1 is missing ENABLED statement - config invalid!"
-	elif [ ! $ENABLED == true ] && [ ! $ENABLED == false ]; then
+	elif [ ! "$ENABLED" == "true" ] && [ ! "$ENABLED" == "false" ]; then
 		echo "config $1 has ENABLED set to something other than 'true' or 'false'"
 	fi
 
@@ -33,18 +33,18 @@ configcheck ()
 	# Check config for Archive and Archive Directory statements
 	if ! grep --quiet ARCHIVE\= $1; then
 		echo "config $1 is missing ARCHIVE statement - config invalid!"
-	elif [ ! $ARCHIVE == true ] && [ ! $ARCHIVE == false ]; then
+	elif [ ! "$ARCHIVE" == "true" ] && [ ! "$ARCHIVE" == "false" ]; then
 		echo "config $1 has ARCHIVE set to something other than 'true' or 'false'"
-	elif [ $ARCHIVE == true ] && ! grep --quiet ARCHIVE_DIR\= $1; then
+	elif [ "$ARCHIVE" == "true" ] && ! grep --quiet ARCHIVE_DIR\= $1; then
 		echo "config $1 has ARCHIVE set true but is missing ARCHIVE_DIR - config invalid!"
 	fi
 
 	# Check for Modify and Perform statements
 	if ! grep --quiet MODIFY\= $1; then
 		echo "config $1 is missing MODIFY statement"
-	elif [ ! $MODIFY == true ] && [ ! $MODIFY == false ]; then
+	elif [ ! "$MODIFY" == "true" ] && [ ! "$MODIFY" == "false" ]; then
 		echo "config $1 has MODIFY set to something other than 'true' or 'false'"
-	elif [ $MODIFY == true ] && ! grep --quiet PERFORM\= $1; then
+	elif [ "$MODIFY" == "true" ] && ! grep --quiet PERFORM\= $1; then
 		echo "config $1 has MODIFY set true, but is missing PERFORM statement - config invalid!"
 	fi
 
@@ -55,18 +55,19 @@ configcheck ()
 }
 
 # Check for flags here (testing!)
-while getopts ":f:" opt; do
+while getopts ":f:c:" opt; do
         case $opt in
                 f)
-                        echo "you chose the file $OPTARG!";exit 0
-                        # Do a thing with a single file specified
-						# configcheck $OPTARG
+                    echo "you chose the file $OPTARG!";exit 0                  
                 ;;
+				c)
+					source $OPTARG;configcheck $OPTARG;exit 0
+				;;
                 \?)
-                        echo "Invalid option: -$OPTARG" >&2;exit 1
+					echo "Invalid option: -$OPTARG" >&2;exit 1
                 ;;
                 :)
-                        echo "Option -$OPTARG requires an argument."
+					echo "Option -$OPTARG requires an argument." >&2;exit 1
                 ;;
         esac
 done
