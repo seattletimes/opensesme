@@ -56,26 +56,26 @@ configcheck ()
 
 # Check for flags here (testing!)
 while getopts ":f:c:" opt; do
-        case $opt in
-                f)
-                    echo "you chose the file $OPTARG!"
-					exit 0                  
-                ;;
-				c)
-					echo "Checking config file $OPTARG for integrity"
-					source $OPTARG
-					configcheck $OPTARG
-					exit 0
-				;;
-                \?)
-					echo "Invalid option: -$OPTARG" >&2
-					exit 1
-                ;;
-                :)
-					echo "Option -$OPTARG requires an argument." >&2
-					exit 1
-                ;;
-        esac
+	case $opt in
+		f)
+			echo "you chose the file $OPTARG!"
+			exit 0                  
+		;;
+		c)
+			echo "Checking config file $OPTARG for integrity"
+			source $OPTARG
+			configcheck $OPTARG
+			exit 0
+		;;
+		\?)
+			echo "Invalid option: -$OPTARG" >&2
+			exit 1
+		;;
+		:)
+			echo "Option -$OPTARG requires an argument." >&2
+			exit 1
+		;;
+	esac
 done
 
 for CONF in $(ls $CONFIG_DIR/*.conf | xargs)
