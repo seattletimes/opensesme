@@ -1,7 +1,7 @@
 #!/bin/bash
 # OpenSESME v0.1.0
 # https://github.com/seattletimes/opensesme
-# E. A. Griffon - 2016-03-25
+# E. A. Griffon - 2016-03-31
 # Thanks to StackExchange, Yaro Kasear, Orville Broadbeak, and Skyler Bunny
 # http://unix.stackexchange.com/questions/24952/script-to-monitor-folder-for-new-files
 
@@ -19,6 +19,12 @@ echo > /tmp/opensesme.pid
 i=0
 # Run count
 r=0
+
+# Make a function for logging
+logit ()
+{
+:
+}
 
 # Make a function to be called to check config files
 # This needs to be fleshed out more to check for malformed paths, invalid characters, etc
@@ -169,8 +175,9 @@ runconfig ()
 }
 
 # Check for flags here (under construction!)
-while getopts ":f:c:" opt; do
+while getopts ":f:cd:" opt; do
 	case $opt in
+		# Run one specified config file
 		f)
 			echo "Running config $OPTARG"
 			CONF=$OPTARG
@@ -178,6 +185,7 @@ while getopts ":f:c:" opt; do
 			((r++))
 			exit 0
 		;;
+		# Check one specified config file
 		c)
 			echo "Checking config file $OPTARG for integrity"
 			source $OPTARG
@@ -185,10 +193,17 @@ while getopts ":f:c:" opt; do
 			((r++))
 			exit 0
 		;;
+		# Set debug level
+		d)
+			echo Setting debug level
+			#LOGLEVEL=$OPTARG
+		;;
+		# Invalid switch handling
 		\?)
 			echo "Invalid option: -$OPTARG" >&2
 			exit 1
 		;;
+		# Error/missing argument handling
 		:)
 			echo "Option -$OPTARG requires an argument." >&2
 			exit 1
