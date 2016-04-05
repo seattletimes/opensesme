@@ -1,7 +1,7 @@
 #!/bin/bash
-# OpenSESME v0.1.0
+# OpenSESME v0.1.1
 # https://github.com/seattletimes/opensesme
-# E. A. Griffon - 2016-03-31
+# E. A. Griffon - 2016-04-05
 # Thanks to StackExchange, Yaro Kasear, Orville Broadbeak, and Skyler Bunny
 # http://unix.stackexchange.com/questions/24952/script-to-monitor-folder-for-new-files
 
@@ -19,6 +19,8 @@ echo > /tmp/opensesme.pid
 i=0
 # Run count
 r=0
+# Debug level
+d=0
 
 # Make a function for logging
 logit ()
@@ -33,45 +35,55 @@ configcheck ()
 	# Check config for ENABLED statement
 	if ! grep --quiet ENABLED\= $1; then
 		echo "Config $1 is missing ENABLED statement - config invalid!"
+		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 is missing ENABLED statement - config invalid!"
 		((i++))
 	elif [ ! "$ENABLED" == "true" ] && [ ! "$ENABLED" == "false" ]; then
-		echo "Config $1 has ENABLED set to something other than 'true' or 'false'"
+		echo "Config $1 has ENABLED set to something other than 'true' or 'false' - config invalid!"
+		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 has ENABLED set to something other than 'true' or 'false' - config invalid!"
 		((i++))
 	fi
 
 	# Check config for Input Directory statement
 	if ! grep --quiet INPUT_DIR\= $1; then
 		echo "Config $1 is missing INPUT_DIR statement - config invalid!"
+		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 is missing INPUT_DIR statement - config invalid!"
 		((i++))
 	fi
 
 	# Check config for Archive and Archive Directory statements
 	if ! grep --quiet ARCHIVE\= $1; then
 		echo "Config $1 is missing ARCHIVE statement - config invalid!"
+		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 is missing ARCHIVE statement - config invalid!"
 		((i++))
 	elif [ ! "$ARCHIVE" == "true" ] && [ ! "$ARCHIVE" == "false" ]; then
-		echo "Config $1 has ARCHIVE set to something other than 'true' or 'false'"
+		echo "Config $1 has ARCHIVE set to something other than 'true' or 'false' - config invalid!"
+		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 has ARCHIVE set to something other than 'true' or 'false' - config invalid!"
 		((i++))
 	elif [ "$ARCHIVE" == "true" ] && ! grep --quiet ARCHIVE_DIR\= $1; then
 		echo "Config $1 has ARCHIVE set true but is missing ARCHIVE_DIR - config invalid!"
+		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 has ARCHIVE set true but is missing ARCHIVE_DIR - config invalid!"
 		((i++))
 	fi
 
 	# Check for Modify and Perform statements
 	if ! grep --quiet MODIFY\= $1; then
-		echo "Config $1 is missing MODIFY statement"
+		echo "Config $1 is missing MODIFY statement - config invalid!"
+		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 is missing MODIFY statement - config invalid!"
 		((i++))
 	elif [ ! "$MODIFY" == "true" ] && [ ! "$MODIFY" == "false" ]; then
-		echo "Config $1 has MODIFY set to something other than 'true' or 'false'"
+		echo "Config $1 has MODIFY set to something other than 'true' or 'false' - config invalid!"
+		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 has MODIFY set to something other than 'true' or 'false' - config invalid!"
 		((i++))
 	elif [ "$MODIFY" == "true" ] && ! grep --quiet PERFORM\= $1; then
 		echo "Config $1 has MODIFY set true, but is missing PERFORM statement - config invalid!"
+		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 has MODIFY set true, but is missing PERFORM statement - config invalid!"
 		((i++))
 	fi
 
 	# Check for Output Directory statement
 	if ! grep --quiet OUTPUT_DIR\= $1; then
 		echo "Config $1 is missing OUTPUT_DIR statement - config invalid!"
+		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 is missing OUTPUT_DIR statement - config invalid!"
 		((i++))
 	fi
 	
