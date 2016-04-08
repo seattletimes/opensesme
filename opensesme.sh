@@ -1,7 +1,7 @@
 #!/bin/bash
 # OpenSESME v0.1.1
 # https://github.com/seattletimes/opensesme
-# E. A. Griffon - 2016-04-05
+# E. A. Griffon - 2016-04-08
 # Thanks to StackExchange, Yaro Kasear, Orville Broadbeak, and Skyler Bunny
 # http://unix.stackexchange.com/questions/24952/script-to-monitor-folder-for-new-files
 
@@ -154,8 +154,8 @@ runconfig ()
 			# Let's DO STUFF!
 			if [ $MODIFY == true ]
 			then	
-				#$PERFORM ||(echo >> $LOGFILE "`date -Is` $ACTION_NAME: Execution of $PERFORM has failed for $path/$file"; logger -p local2.notice -t OplenSESME -- $ACTION_NAME: Execution of $PERFORM has failed for $path/$file)
-				echo >> $LOGFILE "`date -Is` $ACTION_NAME: We did $PERFORM!"
+				$PERFORM $path/$file ||(echo >> $LOGFILE "`date -Is` $ACTION_NAME: Execution of $PERFORM has failed for $path/$file"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: Execution of $PERFORM has failed for $path/$file)
+				#echo >> $LOGFILE "`date -Is` $ACTION_NAME: We did $PERFORM!"
 			fi
 
 			# Define FILENAME as the filename with timestamp
@@ -187,7 +187,7 @@ runconfig ()
 }
 
 # Check for flags here (under construction!)
-while getopts ":f:cd:" opt; do
+while getopts ":f:c:d:" opt; do
 	case $opt in
 		# Run one specified config file
 		f)
@@ -207,7 +207,7 @@ while getopts ":f:cd:" opt; do
 		;;
 		# Set debug level
 		d)
-			echo Setting debug level
+			echo Setting debug level to $OPTARG
 			#LOGLEVEL=$OPTARG
 		;;
 		# Invalid switch handling
