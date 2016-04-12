@@ -71,7 +71,6 @@ configcheck ()
 		echo "Config $1 has a malformed ARCHIVE_DIR directory path (not absolute/does not start with /)"
 		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 has a malformed ARCHIVE_DIR directory path (not absolute/does not start with /)"
 		((i++))
-	elif [ "$ARCHIVE" == "true" ] && grep --quiet "ARCHIVE_DIR\=.*/$" $1; then
 	fi
 
 
