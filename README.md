@@ -33,12 +33,19 @@ There is a function `configcheck` that is used to do a (currently very basic) ch
 
 
 #####OPTIONS
+
 `-c [filename]` 
 	use the `configcheck` function to check the given configuration file, then exit 
 
 `-f [filename]` 
 	run opensesme with the given configuration file, then exit
 
+#####INCLUDED FILES
+
+- opensesme.sh - the main script
+- README.md - this file
+- test.conf - a sample configuration file
+- logrotate.d/opensesme - a configuration file for use with logrotate, to rotate the opensesme log file. Typically placed in /etc/logrotate.d/
 
 #####PLANNED IMPROVEMENTS
 

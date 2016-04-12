@@ -1,0 +1,11 @@
+/var/log/opensesme.log
+{
+	missingok
+	weekly
+	rotate 4
+	compress
+	notifempty
+	dateext
+	dateformat -%Y-%m-%d
+	shred
+}
