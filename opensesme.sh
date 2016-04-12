@@ -1,7 +1,7 @@
 #!/bin/bash
-# OpenSESME v0.1.1
+# OpenSESME v0.1.2
 # https://github.com/seattletimes/opensesme
-# E. A. Griffon - 2016-04-08
+# E. A. Griffon - 2016-04-12
 # Thanks to StackExchange, Yaro Kasear, Orville Broadbeak, and Skyler Bunny
 # http://unix.stackexchange.com/questions/24952/script-to-monitor-folder-for-new-files
 
@@ -33,7 +33,7 @@ logit ()
 configcheck () 
 {
 	# Check config for ENABLED statement
-	if ! grep --quiet ENABLED\= $1; then
+	if ! grep --quiet "ENABLED\=" $1; then
 		echo "Config $1 is missing ENABLED statement - config invalid!"
 		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 is missing ENABLED statement - config invalid!"
 		((i++))
@@ -44,14 +44,18 @@ configcheck ()
 	fi
 
 	# Check config for Input Directory statement
-	if ! grep --quiet INPUT_DIR\= $1; then
+	if ! grep --quiet "INPUT_DIR\=" $1; then
 		echo "Config $1 is missing INPUT_DIR statement - config invalid!"
 		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 is missing INPUT_DIR statement - config invalid!"
+		((i++))
+	elif ! grep --quiet "INPUT_DIR\=\/" $1; then
+		echo "Config $1 has a malformed INPUT_DIR directory path (not absolute/does not start with /)"
+		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 has a malformed INPUT_DIR directory path (not absolute/does not start with /)"
 		((i++))
 	fi
 
 	# Check config for Archive and Archive Directory statements
-	if ! grep --quiet ARCHIVE\= $1; then
+	if ! grep --quiet "ARCHIVE\=" $1; then
 		echo "Config $1 is missing ARCHIVE statement - config invalid!"
 		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 is missing ARCHIVE statement - config invalid!"
 		((i++))
@@ -59,14 +63,20 @@ configcheck ()
 		echo "Config $1 has ARCHIVE set to something other than 'true' or 'false' - config invalid!"
 		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 has ARCHIVE set to something other than 'true' or 'false' - config invalid!"
 		((i++))
-	elif [ "$ARCHIVE" == "true" ] && ! grep --quiet ARCHIVE_DIR\= $1; then
+	elif [ "$ARCHIVE" == "true" ] && ! grep --quiet "ARCHIVE_DIR\=" $1; then
 		echo "Config $1 has ARCHIVE set true but is missing ARCHIVE_DIR - config invalid!"
 		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 has ARCHIVE set true but is missing ARCHIVE_DIR - config invalid!"
 		((i++))
+	elif [ "$ARCHIVE" == "true" ] && ! grep --quiet "ARCHIVE_DIR\=\/" $1; then
+		echo "Config $1 has a malformed ARCHIVE_DIR directory path (not absolute/does not start with /)"
+		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 has a malformed ARCHIVE_DIR directory path (not absolute/does not start with /)"
+		((i++))
+	elif [ "$ARCHIVE" == "true" ] && grep --quiet "ARCHIVE_DIR\=.*/$" $1; then
 	fi
 
+
 	# Check for Modify and Perform statements
-	if ! grep --quiet MODIFY\= $1; then
+	if ! grep --quiet "MODIFY\=" $1; then
 		echo "Config $1 is missing MODIFY statement - config invalid!"
 		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 is missing MODIFY statement - config invalid!"
 		((i++))
@@ -74,24 +84,29 @@ configcheck ()
 		echo "Config $1 has MODIFY set to something other than 'true' or 'false' - config invalid!"
 		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 has MODIFY set to something other than 'true' or 'false' - config invalid!"
 		((i++))
-	elif [ "$MODIFY" == "true" ] && ! grep --quiet PERFORM\= $1; then
+	elif [ "$MODIFY" == "true" ] && ! grep --quiet "PERFORM\=" $1; then
 		echo "Config $1 has MODIFY set true, but is missing PERFORM statement - config invalid!"
 		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 has MODIFY set true, but is missing PERFORM statement - config invalid!"
 		((i++))
 	fi
 
 	# Check for Output Directory statement
-	if ! grep --quiet OUTPUT_DIR\= $1; then
+	if ! grep --quiet "OUTPUT_DIR\=" $1; then
 		echo "Config $1 is missing OUTPUT_DIR statement - config invalid!"
 		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 is missing OUTPUT_DIR statement - config invalid!"
 		((i++))
+	elif ! grep --quiet "OUTPUT_DIR\=\/" $1; then
+		echo "Config $1 has a malformed OUTPUT_DIR directory path (not absolute/does not start with /)"
+		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 has a malformed OUTPUT_DIR directory path (not absolute/does not start with /)"
+		((i++))
 	fi
-	
-	echo "The config has $i errors."
-	
+
 	if [ ! $i -eq 0 ]; then
+		echo "The config has $i errors."
 		exit 1
-	fi	
+	else
+		echo "Congratulations, the config has $i errors."
+	fi		
 }
 
 
