@@ -1,7 +1,7 @@
 #!/bin/bash
-# OpenSESME v0.1.2
+# OpenSESME v0.1.3
 # https://github.com/seattletimes/opensesme
-# E. A. Griffon - 2016-04-12
+# E. A. Griffon - 2016-04-21
 # Thanks to StackExchange, Yaro Kasear, Orville Broadbeak, and Skyler Bunny
 # http://unix.stackexchange.com/questions/24952/script-to-monitor-folder-for-new-files
 
@@ -102,9 +102,11 @@ configcheck ()
 
 	if [ ! $i -eq 0 ]; then
 		echo "The config has $i errors."
+		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 has $i errors."
 		exit 1
 	else
 		echo "Congratulations, the config has $i errors."
+		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 has $i errors."
 	fi		
 }
 
