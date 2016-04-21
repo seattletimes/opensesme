@@ -169,7 +169,8 @@ runconfig ()
 			
 			# Let's DO STUFF!
 			if [ $MODIFY == true ]
-			then	
+			then
+				echo >> $LOGFILE "`date -Is` $ACTION_NAME: Performing $PERFORM on $path/$file"
 				$PERFORM $path/$file ||(echo >> $LOGFILE "`date -Is` $ACTION_NAME: Execution of $PERFORM has failed for $path/$file"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: Execution of $PERFORM has failed for $path/$file)
 				#echo >> $LOGFILE "`date -Is` $ACTION_NAME: We did $PERFORM!"
 			fi
