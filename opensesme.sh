@@ -167,30 +167,31 @@ runconfig ()
 				fi
 			fi
 			
+			# Define FILENAME as the filename with timestamp
+			FILENAME=$file\_`date -Is`
+			
 			# Let's DO STUFF!
 			if [ $MODIFY == true ]
 			then
 				echo >> $LOGFILE "`date -Is` $ACTION_NAME: Performing $PERFORM on $path/$file"
-				$PERFORM $path/$file ||(echo >> $LOGFILE "`date -Is` $ACTION_NAME: Execution of $PERFORM has failed for $path/$file"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: Execution of $PERFORM has failed for $path/$file)
+				$PERFORM $path/$file > $OUTPUT_DIR/$FILENAME $ ||(echo >> $LOGFILE "`date -Is` $ACTION_NAME: Execution of $PERFORM has failed for $path/$file"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: Execution of $PERFORM has failed for $path/$file)
 				#echo >> $LOGFILE "`date -Is` $ACTION_NAME: We did $PERFORM!"
+			else
+				# Move the file to the output directory with the new FILENAME, add error checking
+				mv $path/$file $OUTPUT_DIR/$FILENAME || (echo >> $LOGFILE "`date -Is` $ACTION_NAME: mv has failed for $path/$file to $OUTPUT_DIR/$FILENAME"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: mv has failed for $path/$file to $OUTPUT_DIR/$FILENAME)
+
+				# Test to see if file is not actually there, and if it isn't, log errors
+				if
+					[ ! -e "$OUTPUT_DIR/$FILENAME" ]
+				then
+					echo >> $LOGFILE "`date -Is` $ACTION_NAME: File check has failed for presence of $OUTPUT_DIR/$FILENAME"
+					logger -p local2.notice -t OpenSESME -- $ACTION_NAME: File check has failed for presence of $OUTPUT_DIR/$FILENAME
+				else 
+					# "Log" the events
+					echo >> $LOGFILE "`date -Is` $ACTION_NAME: Moved $file from $path to $OUTPUT_DIR as $FILENAME"
+				fi
 			fi
-
-			# Define FILENAME as the filename with timestamp
-			FILENAME=$file\_`date -Is`
-
-			# Move the file to the output directory with the new FILENAME, add error checking
-			mv $path/$file $OUTPUT_DIR/$FILENAME || (echo >> $LOGFILE "`date -Is` $ACTION_NAME: mv has failed for $path/$file to $OUTPUT_DIR/$FILENAME"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: mv has failed for $path/$file to $OUTPUT_DIR/$FILENAME)
-
-					# Test to see if file is not actually there, and if it isn't, log errors
-					if
-						[ ! -e "$OUTPUT_DIR/$FILENAME" ]
-					then
-						echo >> $LOGFILE "`date -Is` $ACTION_NAME: File check has failed for presence of $OUTPUT_DIR/$FILENAME"
-						logger -p local2.notice -t OpenSESME -- $ACTION_NAME: File check has failed for presence of $OUTPUT_DIR/$FILENAME
-					else 
-						# "Log" the events
-						echo >> $LOGFILE "`date -Is` $ACTION_NAME: Moved $file from $path to $OUTPUT_DIR as $FILENAME"
-					fi
+				
 	 
 		# Run the loop in the background with '&'
 		done &
