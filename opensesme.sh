@@ -1,7 +1,7 @@
 #!/bin/bash
-# OpenSESME v0.1.3
+# OpenSESME v0.2.0
 # https://github.com/seattletimes/opensesme
-# E. A. Griffon - 2016-04-21
+# E. A. Griffon - 2016-04-26
 # Thanks to StackExchange, Yaro Kasear, Orville Broadbeak, and Skyler Bunny
 # http://unix.stackexchange.com/questions/24952/script-to-monitor-folder-for-new-files
 
@@ -146,7 +146,13 @@ runconfig ()
 
 		# Start a loop that pulls variables from inotifywait
 		while read path action file; do
-
+			
+			# Check to see if these are the droids we're looking for
+			if [[ $file != $TARGET ]]
+			then
+				break
+			fi
+			
 			# Log that the file has appeared
 			echo >> $LOGFILE "`date -Is` $ACTION_NAME: The file $file appeared in directory $path via $action"
 
@@ -191,10 +197,10 @@ runconfig ()
 					echo >> $LOGFILE "`date -Is` $ACTION_NAME: Moved $file from $path to $OUTPUT_DIR as $FILENAME"
 				fi
 			fi
-				
-	 
+								 
 		# Run the loop in the background with '&'
 		done &
+		
 	# Record the pid of the last run program (not... quite working in a useful way)
 	echo $! - $ACTION_NAME >>/tmp/opensesme.pid
 	
