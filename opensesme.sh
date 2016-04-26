@@ -150,7 +150,7 @@ runconfig ()
 			# Check to see if these are the droids we're looking for
 			if [[ $file != $TARGET ]]
 			then
-				break
+				continue
 			fi
 			
 			# Log that the file has appeared
