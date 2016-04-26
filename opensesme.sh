@@ -30,7 +30,7 @@ logit ()
 
 # Make a function to be called to check config files
 # This needs to be fleshed out more to check for malformed paths, invalid characters, etc
-configcheck () 
+configcheck ()
 {
 	# Check config for ENABLED statement
 	if ! grep --quiet "ENABLED\=" $1; then
@@ -107,35 +107,34 @@ configcheck ()
 	else
 		echo "Congratulations, the config has $i errors."
 		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 has $i errors."
-	fi		
+	fi
 }
-
 
 # Main function to run a given CONF file
 runconfig ()
 {
 	echo -e "Reading $CONF"
-        echo >> $LOGFILE "`date -Is` OpenSESME Main: Reading $CONF"
-   
-		source $CONF
-
-		# Use function to check config file
-		
-		configcheck $CONF
-		
-        # Exit if the config is disabled
-        if [ $ENABLED == false ]
-        then
-			echo "`date -Is` OpenSESME Main: $CONF is disabled."
-            echo >> $LOGFILE "`date -Is` OpenSESME Main: $CONF is disabled."
-            exit 0
-        fi
 	
+	echo >> $LOGFILE "`date -Is` OpenSESME Main: Reading $CONF"
+
+	source $CONF
+
+	# Use function to check config file
+	configcheck $CONF
+
+	# Exit if the config is disabled
+	if [ $ENABLED == false ]
+	then
+		echo "`date -Is` OpenSESME Main: $CONF is disabled."
+		echo >> $LOGFILE "`date -Is` OpenSESME Main: $CONF is disabled."
+		exit 0
+	fi
+
 	# Log things about the action
 	logger -p local2.notice -t OpenSESME -- Starting action $ACTION_NAME
 	echo >> $LOGFILE "`date -Is` OpenSESME Main: Starting action $ACTION_NAME"
 	echo >> $LOGFILE "`date -Is` $ACTION_NAME: Input directory is $INPUT_DIR"
-	#echo >> $LOGFILE "`date -Is` $ACTION_NAME: Target is $TARGET"
+	echo >> $LOGFILE "`date -Is` $ACTION_NAME: Target is $TARGET"
 	echo >> $LOGFILE "`date -Is` $ACTION_NAME: Archive directory is $ARCHIVE_DIR"
 	echo >> $LOGFILE "`date -Is` $ACTION_NAME: Output directory is $OUTPUT_DIR"
 	echo >> $LOGFILE "`date -Is` $ACTION_NAME: Archiving set to $ARCHIVE"
@@ -144,66 +143,64 @@ runconfig ()
 	# inotify does the heavy lifting here - it'll monitor and let us know when a file is done being written to (i.e. a FTP transfer stops, move is done, etc)
 	inotifywait -m $INPUT_DIR -e close_write |
 
-		# Start a loop that pulls variables from inotifywait
-		while read path action file; do
-			
-			# Check to see if these are the droids we're looking for
-			if [[ $file != $TARGET ]]
-			then
-				continue
-			fi
-			
-			# Log that the file has appeared
-			echo >> $LOGFILE "`date -Is` $ACTION_NAME: The file $file appeared in directory $path via $action"
+	# Start a loop that pulls variables from inotifywait
+	while read path action file; do
 
-			# Archive an unmodified version
-			if [ $ARCHIVE == true ]
+		# Check to see if these are the droids we're looking for
+		if [[ $file != $TARGET ]]
+		then
+			continue
+		fi
+
+		# Log that the file has appeared
+		echo >> $LOGFILE "`date -Is` $ACTION_NAME: The file $file appeared in directory $path via $action"
+
+		# Archive an unmodified version
+		if [ $ARCHIVE == true ]
+		then
+			cp $path/$file $ARCHIVE_DIR/$file|| (echo >> $LOGFILE "`date -Is` $ACTION_NAME: archival copy has failed for $path/$file to $ARCHIVE_DIR/$file"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: archival copy has failed for $path/$file to $ARCHIVE_DIR/$file)
+
+			# Test to see if archive file is not actually there, and if it isn't, log errors
+			if [ ! -e "$ARCHIVE_DIR/$file" ]
 			then
-				cp $path/$file $ARCHIVE_DIR/$file|| (echo >> $LOGFILE "`date -Is` $ACTION_NAME: archival copy has failed for $path/$file to $ARCHIVE_DIR/$file"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: archival copy has failed for $path/$file to $ARCHIVE_DIR/$file)
-			
-				# Test to see if archive file is not actually there, and if it isn't, log errors
-				if
-					[ ! -e "$ARCHIVE_DIR/$file" ]
-				then
-					echo >> $LOGFILE "`date -Is` $ACTION_NAME: File check has failed for presence of archived file in $ARCHIVE_DIR/$file"
-					logger -p local2.notice -t OpenSESME -- $ACTION_NAME: File check has failed for presence of archived file in $ARCHIVE_DIR/$file
-				else 
-					# "Log" the events
-					echo >> $LOGFILE "`date -Is` $ACTION_NAME: Archived $file from $path to $ARCHIVE_DIR/$file"
-				fi
-			fi
-			
-			# Define FILENAME as the filename with timestamp
-			FILENAME=$file\_`date -Is`
-			
-			# Let's DO STUFF!
-			if [ $MODIFY == true ]
-			then
-				echo >> $LOGFILE "`date -Is` $ACTION_NAME: Performing $PERFORM on $path/$file"
-				$PERFORM $path/$file > $OUTPUT_DIR/$FILENAME $ ||(echo >> $LOGFILE "`date -Is` $ACTION_NAME: Execution of $PERFORM has failed for $path/$file"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: Execution of $PERFORM has failed for $path/$file)
-				#echo >> $LOGFILE "`date -Is` $ACTION_NAME: We did $PERFORM!"
+				echo >> $LOGFILE "`date -Is` $ACTION_NAME: File check has failed for presence of archived file in $ARCHIVE_DIR/$file"
+				logger -p local2.notice -t OpenSESME -- $ACTION_NAME: File check has failed for presence of archived file in $ARCHIVE_DIR/$file
 			else
-				# Move the file to the output directory with the new FILENAME, add error checking
-				mv $path/$file $OUTPUT_DIR/$FILENAME || (echo >> $LOGFILE "`date -Is` $ACTION_NAME: mv has failed for $path/$file to $OUTPUT_DIR/$FILENAME"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: mv has failed for $path/$file to $OUTPUT_DIR/$FILENAME)
-
-				# Test to see if file is not actually there, and if it isn't, log errors
-				if
-					[ ! -e "$OUTPUT_DIR/$FILENAME" ]
-				then
-					echo >> $LOGFILE "`date -Is` $ACTION_NAME: File check has failed for presence of $OUTPUT_DIR/$FILENAME"
-					logger -p local2.notice -t OpenSESME -- $ACTION_NAME: File check has failed for presence of $OUTPUT_DIR/$FILENAME
-				else 
-					# "Log" the events
-					echo >> $LOGFILE "`date -Is` $ACTION_NAME: Moved $file from $path to $OUTPUT_DIR as $FILENAME"
-				fi
+				# "Log" the events
+				echo >> $LOGFILE "`date -Is` $ACTION_NAME: Archived $file from $path to $ARCHIVE_DIR/$file"
 			fi
-								 
-		# Run the loop in the background with '&'
-		done &
-		
+		fi
+
+		# Define FILENAME as the filename with timestamp
+		FILENAME=$file\_`date -Is`
+
+		# Let's DO STUFF!
+		if [ $MODIFY == true ]
+		then
+			echo >> $LOGFILE "`date -Is` $ACTION_NAME: Performing $PERFORM on $path/$file"
+			$PERFORM $path/$file ||(echo >> $LOGFILE "`date -Is` $ACTION_NAME: Execution of $PERFORM has failed for $path/$file"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: Execution of $PERFORM has failed for $path/$file)
+		fi
+
+		# Move the file to the output directory with the new FILENAME, add error checking
+		mv $path/$file $OUTPUT_DIR/$FILENAME || (echo >> $LOGFILE "`date -Is` $ACTION_NAME: mv has failed for $path/$file to $OUTPUT_DIR/$FILENAME"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: mv has failed for $path/$file to $OUTPUT_DIR/$FILENAME)
+
+		# Test to see if file is not actually there, and if it isn't, log errors
+		if
+			[ ! -e "$OUTPUT_DIR/$FILENAME" ]
+		then
+			echo >> $LOGFILE "`date -Is` $ACTION_NAME: File check has failed for presence of $OUTPUT_DIR/$FILENAME"
+			logger -p local2.notice -t OpenSESME -- $ACTION_NAME: File check has failed for presence of $OUTPUT_DIR/$FILENAME
+		else
+			# "Log" the events
+			echo >> $LOGFILE "`date -Is` $ACTION_NAME: Moved $file from $path to $OUTPUT_DIR as $FILENAME"
+		fi
+
+	# Run the loop in the background with '&'
+	done &
+
 	# Record the pid of the last run program (not... quite working in a useful way)
 	echo $! - $ACTION_NAME >>/tmp/opensesme.pid
-	
+
 	# If this was called with an option, exit, otherwise continue to parse config files
 	if [ ! $r -eq 0 ]; then
 		exit 0
