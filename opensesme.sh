@@ -174,15 +174,29 @@ runconfig ()
 		# Define FILENAME as the filename with timestamp
 		FILENAME=$file\_`date -Is`
 
-		# Let's DO STUFF!
+		# Doin' work, movin the file
 		if [ $MODIFY == true ]
 		then
-			echo >> $LOGFILE "`date -Is` $ACTION_NAME: Performing $PERFORM on $path/$file"
-			$PERFORM $path/$file ||(echo >> $LOGFILE "`date -Is` $ACTION_NAME: Execution of $PERFORM has failed for $path/$file"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: Execution of $PERFORM has failed for $path/$file)
+			# Define TEMPFILE as the filename with _tmp extension
+			TEMPFILE=$file\_tmp
+			
+			# Move the file to /tmp for modification
+			echo >> $LOGFILE "`date -Is` $ACTION_NAME: Moving $path/$file to temporary directory for modification"
+			mv $path/$file /tmp/$TEMPFILE || (echo >> $LOGFILE "`date -Is` $ACTION_NAME: mv has failed for $path/$file to /tmp/$TEMPFILE"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: mv has failed for $path/$file to /tmp/$TEMPFILE)
+			
+			# Perform the modification
+			echo >> $LOGFILE "`date -Is` $ACTION_NAME: Performing $PERFORM on /tmp/$TEMPFILE"
+			$PERFORM /tmp/$TEMPFILE ||(echo >> $LOGFILE "`date -Is` $ACTION_NAME: Execution of $PERFORM has failed on /tmp/$TEMPFILE"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: Execution of $PERFORM has failed on /tmp/$TEMPFILE)
+			
+			# Move the modified file to the output directory
+			echo >> $LOGFILE "`date -Is` $ACTION_NAME: Moving /tmp/$TEMPFILE to $OUTPUT_DIR as $FILENAME"
+			mv /tmp/$TEMPFILE $OUTPUT_DIR/$FILENAME || (echo >> $LOGFILE "`date -Is` $ACTION_NAME: mv has failed for /tmp/$TEMPFILE to $OUTPUT_DIR/$FILENAME"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: mv has failed for /tmp/$TEMPFILE to $OUTPUT_DIR/$FILENAME)
+		
+		else
+			# If no modification, just move the file to the output directory with the new FILENAME
+			echo >> $LOGFILE "`date -Is` $ACTION_NAME: Moving $path/$file to $OUTPUT_DIR as $FILENAME"
+			mv $path/$file $OUTPUT_DIR/$FILENAME || (echo >> $LOGFILE "`date -Is` $ACTION_NAME: mv has failed for $path/$file to $OUTPUT_DIR/$FILENAME"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: mv has failed for $path/$file to $OUTPUT_DIR/$FILENAME)
 		fi
-
-		# Move the file to the output directory with the new FILENAME, add error checking
-		mv $path/$file $OUTPUT_DIR/$FILENAME || (echo >> $LOGFILE "`date -Is` $ACTION_NAME: mv has failed for $path/$file to $OUTPUT_DIR/$FILENAME"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: mv has failed for $path/$file to $OUTPUT_DIR/$FILENAME)
 
 		# Test to see if file is not actually there, and if it isn't, log errors
 		if
@@ -199,7 +213,7 @@ runconfig ()
 	done &
 
 	# Record the pid of the last run program (not... quite working in a useful way)
-	echo $! - $ACTION_NAME >>/tmp/opensesme.pid
+	#echo $! - $ACTION_NAME >>/tmp/opensesme.pid
 
 	# If this was called with an option, exit, otherwise continue to parse config files
 	if [ ! $r -eq 0 ]; then
