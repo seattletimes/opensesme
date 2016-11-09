@@ -99,6 +99,13 @@ configcheck ()
 		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 has a malformed OUTPUT_DIR directory path (not absolute/does not start with /)"
 		((i++))
 	fi
+	
+	# Check for File Name statement
+	if ! grep --quiet "FILENAME\=" $1; then
+		echo "Config $1 is missing FILENAME statement - config invalid!"
+		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 is missing FILENAME statement - config invalid!"
+		((i++))
+	fi
 
 	if [ ! $i -eq 0 ]; then
 		echo "The config has $i errors."
@@ -172,7 +179,7 @@ runconfig ()
 		fi
 
 		# Define FILENAME as the filename with timestamp
-		FILENAME=$file\_`date -Is`
+		#FILENAME=$file\_`date -Is`
 
 		# Doin' work, movin the file
 		if [ $MODIFY == true ]
