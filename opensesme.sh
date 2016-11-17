@@ -54,7 +54,7 @@ configcheck ()
 		((i++))
 	fi
 
-	# Check config for Archive and Archive Directory statements
+	# Check config for Archive, Archive Directory, and Archive Filename statements
 	if ! grep --quiet "ARCHIVE\=" $1; then
 		echo "Config $1 is missing ARCHIVE statement - config invalid!"
 		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 is missing ARCHIVE statement - config invalid!"
@@ -70,6 +70,10 @@ configcheck ()
 	elif [ "$ARCHIVE" == "true" ] && ! grep --quiet "ARCHIVE_DIR\=\/" $1; then
 		echo "Config $1 has a malformed ARCHIVE_DIR directory path (not absolute/does not start with /)"
 		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 has a malformed ARCHIVE_DIR directory path (not absolute/does not start with /)"
+		((i++))
+	elif [ "$ARCHIVE" == "true" ] && ! grep --quiet "ARCHIVE_FILENAME\=" $1; then
+		echo "Config $1 has ARCHIVE set true but is missing ARCHIVE_FILENAME - config invalid!"
+		echo >> $LOGFILE "`date -Is` OpenSESME: Config $1 has ARCHIVE set true but is missing ARCHIVE_FILENAME - config invalid!"
 		((i++))
 	fi
 
@@ -165,16 +169,16 @@ runconfig ()
 		# Archive an unmodified version
 		if [ $ARCHIVE == true ]
 		then
-			cp $path/$file $ARCHIVE_DIR/$file|| (echo >> $LOGFILE "`date -Is` $ACTION_NAME: archival copy has failed for $path/$file to $ARCHIVE_DIR/$file"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: archival copy has failed for $path/$file to $ARCHIVE_DIR/$file)
+			cp $path/$file $ARCHIVE_DIR/$ARCHIVE_FILENAME|| (echo >> $LOGFILE "`date -Is` $ACTION_NAME: archival copy has failed for $path/$file to $ARCHIVE_DIR/$ARCHIVE_FILENAME"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: archival copy has failed for $path/$file to $ARCHIVE_DIR/$ARCHIVE_FILENAME)
 
 			# Test to see if archive file is not actually there, and if it isn't, log errors
-			if [ ! -e "$ARCHIVE_DIR/$file" ]
+			if [ ! -e "$ARCHIVE_DIR/$ARCHIVE_FILENAME" ]
 			then
 				echo >> $LOGFILE "`date -Is` $ACTION_NAME: File check has failed for presence of archived file in $ARCHIVE_DIR/$file"
-				logger -p local2.notice -t OpenSESME -- $ACTION_NAME: File check has failed for presence of archived file in $ARCHIVE_DIR/$file
+				logger -p local2.notice -t OpenSESME -- $ACTION_NAME: File check has failed for presence of archived file in $ARCHIVE_DIR/$ARCHIVE_FILENAME
 			else
 				# "Log" the events
-				echo >> $LOGFILE "`date -Is` $ACTION_NAME: Archived $file from $path to $ARCHIVE_DIR/$file"
+				echo >> $LOGFILE "`date -Is` $ACTION_NAME: Archived $file from $path to $ARCHIVE_DIR/$ARCHIVE_FILENAME"
 			fi
 		fi
 
