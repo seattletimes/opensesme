@@ -1,7 +1,7 @@
 #!/bin/bash
-# OpenSESME v0.2.0
+# OpenSESME v0.2.2
 # https://github.com/seattletimes/opensesme
-# E. A. Griffon - 2016-04-26
+# E. A. Griffon - 2016-12-20
 # Thanks to StackExchange, Yaro Kasear, Orville Broadbeak, and Skyler Bunny
 # http://unix.stackexchange.com/questions/24952/script-to-monitor-folder-for-new-files
 
@@ -166,24 +166,37 @@ runconfig ()
 		# Log that the file has appeared
 		echo >> $LOGFILE "`date -Is` $ACTION_NAME: The file $file appeared in directory $path via $action"
 
+		# Define NEWARCHIVENAME as the archive filename with timestamp, if requested
+		if [ $ARCHIVE_DATESTAMP == true ]
+		then
+			NEWARCHIVENAME=`date +%Y%m%d_%H%M%S`_$ARCHIVE_FILENAME
+		else
+			NEWARCHIVENAME=$ARCHIVE_FILENAME
+		fi
+		
 		# Archive an unmodified version
 		if [ $ARCHIVE == true ]
 		then
-			cp $path/$file $ARCHIVE_DIR/$ARCHIVE_FILENAME|| (echo >> $LOGFILE "`date -Is` $ACTION_NAME: archival copy has failed for $path/$file to $ARCHIVE_DIR/$ARCHIVE_FILENAME"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: archival copy has failed for $path/$file to $ARCHIVE_DIR/$ARCHIVE_FILENAME)
+			cp $path/$file $ARCHIVE_DIR/$NEWARCHIVENAME && chown $OWNER.$GROUP $ARCHIVE_DIR/$NEWARCHIVENAME && chmod $PERMS $ARCHIVE_DIR/$NEWARCHIVENAME || (echo >> $LOGFILE "`date -Is` $ACTION_NAME: archival copy has failed for $path/$file to $ARCHIVE_DIR/$NEWARCHIVENAME"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: archival copy has failed for $path/$file to $ARCHIVE_DIR/$NEWARCHIVENAME)
 
 			# Test to see if archive file is not actually there, and if it isn't, log errors
-			if [ ! -e "$ARCHIVE_DIR/$ARCHIVE_FILENAME" ]
+			if [ ! -e "$ARCHIVE_DIR/$NEWARCHIVENAME" ]
 			then
 				echo >> $LOGFILE "`date -Is` $ACTION_NAME: File check has failed for presence of archived file in $ARCHIVE_DIR/$file"
-				logger -p local2.notice -t OpenSESME -- $ACTION_NAME: File check has failed for presence of archived file in $ARCHIVE_DIR/$ARCHIVE_FILENAME
+				logger -p local2.notice -t OpenSESME -- $ACTION_NAME: File check has failed for presence of archived file in $ARCHIVE_DIR/$NEWARCHIVENAME
 			else
 				# "Log" the events
-				echo >> $LOGFILE "`date -Is` $ACTION_NAME: Archived $file from $path to $ARCHIVE_DIR/$ARCHIVE_FILENAME"
+				echo >> $LOGFILE "`date -Is` $ACTION_NAME: Archived $file from $path to $ARCHIVE_DIR/$NEWARCHIVENAME"
 			fi
 		fi
 
-		# Define FILENAME as the filename with timestamp
-		#FILENAME=$file\_`date -Is`
+		# Define NEWFILENAME as the filename with timestamp, if requested
+		if [ $DATESTAMP == true ]
+		then
+			NEWFILENAME=`date +%Y%m%d_%H%M%S`_$FILENAME
+		else
+			NEWFILENAME=$FILENAME
+		fi
 
 		# Doin' work, movin the file
 		if [ $MODIFY == true ]
@@ -201,12 +214,12 @@ runconfig ()
 			
 			# Move the modified file to the output directory
 			echo >> $LOGFILE "`date -Is` $ACTION_NAME: Moving /tmp/$TEMPFILE to $OUTPUT_DIR as $FILENAME"
-			mv /tmp/$TEMPFILE $OUTPUT_DIR/$FILENAME || (echo >> $LOGFILE "`date -Is` $ACTION_NAME: mv has failed for /tmp/$TEMPFILE to $OUTPUT_DIR/$FILENAME"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: mv has failed for /tmp/$TEMPFILE to $OUTPUT_DIR/$FILENAME)
+			mv /tmp/$TEMPFILE $OUTPUT_DIR/$FILENAME && chown $OWNER.$GROUP $OUTPUT_DIR/$FILENAME && chmod $PERMS $OUTPUT_DIR/$FILENAME || (echo >> $LOGFILE "`date -Is` $ACTION_NAME: mv has failed for /tmp/$TEMPFILE to $OUTPUT_DIR/$FILENAME"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: mv has failed for /tmp/$TEMPFILE to $OUTPUT_DIR/$FILENAME)
 		
 		else
 			# If no modification, just move the file to the output directory with the new FILENAME
 			echo >> $LOGFILE "`date -Is` $ACTION_NAME: Moving $path/$file to $OUTPUT_DIR as $FILENAME"
-			mv $path/$file $OUTPUT_DIR/$FILENAME || (echo >> $LOGFILE "`date -Is` $ACTION_NAME: mv has failed for $path/$file to $OUTPUT_DIR/$FILENAME"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: mv has failed for $path/$file to $OUTPUT_DIR/$FILENAME)
+			mv $path/$file $OUTPUT_DIR/$FILENAME && chown $OWNER.$GROUP $OUTPUT_DIR/$FILENAME && chmod $PERMS $OUTPUT_DIR/$FILENAME || (echo >> $LOGFILE "`date -Is` $ACTION_NAME: mv has failed for $path/$file to $OUTPUT_DIR/$FILENAME"; logger -p local2.notice -t OpenSESME -- $ACTION_NAME: mv has failed for $path/$file to $OUTPUT_DIR/$FILENAME)
 		fi
 
 		# Test to see if file is not actually there, and if it isn't, log errors
