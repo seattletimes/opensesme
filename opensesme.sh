@@ -1,7 +1,7 @@
 #!/bin/bash
-# OpenSESME v0.3.0 - "Everything Is On Fire"
+# OpenSESME Dev v0.3.1 - "Exclusive"
 # https://github.com/seattletimes/opensesme
-# E. A. Griffon - 2017-03-20
+# E. A. Griffon - 2017-04-20
 # Thanks to StackExchange, Yaro Kasear, Orville Broadbeak, and Skyler Bunny
 
 # Define where configurations are held
@@ -214,6 +214,8 @@ unset GROUP
 unset PERMS
 unset DATESTAMP
 unset RECURSIVE
+unset EXCLUDE_DIR
+unset EXCLUDE_FILE
 unset INO
 }
 	
@@ -293,7 +295,21 @@ runconfig ()
 		if [[ $path == *"$ARCHIVE_DIR"* ]] || [[ $path == *"$OUTPUT_DIR"* ]]; then
 			continue
 		fi
-						
+		
+		# If it's an excluded directory
+		if [[ $path ==  *"$EXCLUDE_DIR"* ]] && [[ -n "$EXCLUDE_DIR" ]]; then
+			echo >> $LOGFILE "`date -Is` $ACTION_NAME: Exclude Debug: Path is $path and Exclude dir is $EXCLUDE_DIR"
+			echo >> $LOGFILE "`date -Is` $ACTION_NAME: "$path""$file" fits directory exclusion criteria and will not be processed."
+			continue
+		fi
+		
+		# If it's an excluded file
+		if [[ $file ==  *"$EXCLUDE_FILE"* ]] && [[ -n "$EXCLUDE_FILE" ]]; then
+			echo >> $LOGFILE "`date -Is` $ACTION_NAME: Exclude Debug: File is $file and exclude file is $EXCLUDE_FILENAME"
+			echo >> $LOGFILE "`date -Is` $ACTION_NAME: "$path""$file" fits file exclusion criteria and will not be processed."
+			continue
+		fi
+		
 		# If a destination filename hasn't been set in the config, just use the given filename.
 		if [[ -z "$FILENAME" ]];
 			then FILENAME=$file
