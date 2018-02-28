@@ -1,7 +1,7 @@
 #!/bin/bash
-# OpenSESME v0.4.2 - "Regret is the father of invention."
+# OpenSESME v0.4.3 - "Regret is the father of invention."
 # https://github.com/seattletimes/opensesme
-# E. A. Griffon - 2018-01-03
+# E. A. Griffon - 2018-02-28
 # Thanks to StackExchange, Yaro Kasear, Orville Broadbeak, and Skyler Bunny
 
 # Define where configurations are held
@@ -223,10 +223,10 @@ runconfig ()
         # Use function to check config file
         configcheck $CONF
 
-        # Exit if the config is disabled
+        # Continue if the config is disabled
         if [[ ! $ENABLED == "true" ]]; then
                 echo "`date -Is` OpenSESME Main: $CONF is disabled." | tee -a $LOGFILE
-                exit 0
+                continue
         fi
 
         # Check for archive directories if config is set RECURSIVE=true and ARCHIVE=true
